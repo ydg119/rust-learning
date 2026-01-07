@@ -1,4 +1,4 @@
 mod thread;
 fn main() {
-    thread::worker_pool::test();
+    thread::pub_sub::test();
 }
