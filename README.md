@@ -1,0 +1,4 @@
+## RUN 
+```shell
+cargo run
+```
