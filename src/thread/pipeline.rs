@@ -31,3 +31,7 @@ pub fn process() {
         });
     });
 }
+
+pub fn test() {
+    process();
+}

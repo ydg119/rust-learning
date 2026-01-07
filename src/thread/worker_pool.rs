@@ -1,31 +1,61 @@
 use std::sync::mpsc;
-use std::thread;
-pub fn process() {
-    // let us use a scope to avoid having to join all the threads
-    thread::scope(|scope| {
-        let (tx, rx) = mpsc::channel();
-        let (tx2, rx2) = mpsc::channel();
-        // stage 1
-        scope.spawn(move || {
-            let data = vec![1, 2, 3, 4, 5];
-            for x in data {
-                // squares each number
-                tx.send(x * x).unwrap();
-            }
+use std::sync::{Arc, Mutex};
+use std::{mem, thread};
+struct Worker {
+    thread: thread::JoinHandle<()>,
+}
+
+impl Worker {
+    fn new(id: usize, receiver: Arc<Mutex<mpsc::Receiver<Option<i32>>>>) -> Self {
+        let thread = thread::spawn(move || loop {
+            let Some(job) = receiver.lock().unwrap().recv().unwrap() else {
+                println!("worker {} exited", id);
+                break;
+            };
+            println!("worker {} received job {}", id, job);
+            thread::sleep(std::time::Duration::from_secs(1));
         });
-        // stage 2
-        scope.spawn(move || {
-            for x in rx {
-                // increments each number
-                tx2.send(x + 1).unwrap();
-            }
-        });
-        // final output
-        scope.spawn(move || {
-            for y in rx2 {
-                // print result
-                println!("{}", y)
-            }
-        });
-    });
+        Self { thread }
+    }
+}
+
+struct WorkerPool {
+    workers: Vec<Worker>,
+    sender: mpsc::Sender<Option<i32>>,
+}
+
+impl WorkerPool {
+    fn new(size: usize) -> Self {
+        let (sender, receiver) = mpsc::channel();
+        let receiver = Arc::new(Mutex::new(receiver));
+        let mut workers = Vec::with_capacity(size);
+        for id in 0..size {
+            workers.push(Worker::new(id, receiver.clone()));
+        }
+        Self { workers, sender }
+    }
+
+    fn execute(&self, job: i32) {
+        self.sender.send(Some(job)).unwrap();
+    }
+}
+
+impl Drop for WorkerPool {
+    fn drop(&mut self) {
+        // send all workers a signal to exit
+        for _ in &self.workers {
+            self.sender.send(None).unwrap();
+        }
+        // wait for all workers to exit
+        for worker in mem::take(&mut self.workers) {
+            worker.thread.join().unwrap();
+        }
+    }
+}
+
+pub fn test() {
+    let pool = WorkerPool::new(10);
+    for i in 0..100 {
+        pool.execute(i);
+    }
 }

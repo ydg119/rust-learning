@@ -20,3 +20,7 @@ pub fn process() {
     producer.join().unwrap();
     comsumer.join().unwrap();
 }
+
+pub fn test() {
+    process();
+}

@@ -1,4 +1,4 @@
 mod thread;
 fn main() {
-    thread::pipeline::process();
+    thread::worker_pool::test();
 }
