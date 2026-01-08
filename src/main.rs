@@ -1,4 +1,5 @@
+mod basic;
 mod thread;
 fn main() {
-    thread::fanin_fanout::test();
+    basic::where_trait::test();
 }
