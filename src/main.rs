@@ -1,5 +1,5 @@
 mod basic;
 
 fn main() {
-    basic::reff::test();
+    basic::tuple_structs::test();
 }
