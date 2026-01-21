@@ -1,5 +1,5 @@
-mod basic;
+mod thread;
 
 fn main() {
-    basic::_file::test();
+    thread::share_memory::test();
 }
