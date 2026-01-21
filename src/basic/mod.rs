@@ -1,5 +1,12 @@
+pub mod _enum;
+pub mod _file;
+pub mod _hashmap;
+pub mod _string;
+pub mod _test;
+pub mod _vec;
 pub mod closure;
 pub mod impl_display;
-pub mod where_trait;
+pub mod rectangle;
 pub mod reff;
 pub mod tuple_structs;
+pub mod where_trait;
