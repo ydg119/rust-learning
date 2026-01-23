@@ -24,5 +24,23 @@ pub fn test() {
     for b in "12ab中国".bytes() {
         println!("{b}")
     }
-    
+}
+
+pub fn reverse(text: &str) -> String {
+    text.chars().rev().collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_reverse_simple() {
+        assert_eq!(reverse("abcdefg"), "gfedcba");
+    }
+
+    #[test]
+    fn test_reverse_sentence() {
+        assert_eq!(reverse("I am a student."), ".tneduts a ma I");
+    }
 }
